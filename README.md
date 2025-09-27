@@ -24,7 +24,7 @@ GUARDIAN_API_KEY=INSERT_KEY_HERE
 1. Run the program with the following command:
 
 ```bash
-node index.js
+node scripts/index.js
 ```
 
 This script will populate the database with articles using the Guardian's API, and populate the json file with article data.

@@ -1,8 +1,10 @@
+const path = require('path');
 const Database = require('better-sqlite3');
 
-const db = new Database('articles.db');
+// Put the database into the data folder
+const dbPath = path.join(__dirname, 'data', 'articles.db');
+const db = new Database(dbPath);
 
-// Create table with UNIQUE constraint on the URL
 db.prepare(`
   CREATE TABLE IF NOT EXISTS articles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
