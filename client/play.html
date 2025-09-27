@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NewsGuesser – Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" src="/play.js"></script>
+  </head>
+  <body class="game-page">
+    <main class="game-layout" role="main">
+      <article class="news-article floating" aria-labelledby="article-title">
+        <div class="article-meta">
+          <span
+            class="category-badge"
+            aria-label="Article category"
+            id="article-section"
+            >World</span
+          >
+          <time
+            datetime="2025-09-27"
+            class="publish-date redacted"
+            id="article-date"
+            >Sep 27, 2025</time
+          >
+        </div>
+        <h2 id="article-title" class="article-title">
+          Mystery Developments Stir Global Conversation
+        </h2>
+
+        <div class="article-body">
+          <figure class="article-media">
+            <img
+              src="https://placehold.co/1100x520/png"
+              alt="Abstract placeholder representing world news"
+              loading="lazy"
+              id="article-image"
+              class="blurred"
+            />
+            <figcaption class="visually-hidden">
+              Illustrative placeholder image
+            </figcaption>
+          </figure>
+        </div>
+      </article>
+      <aside
+        class="game-sidebar"
+        aria-label="Game sidebar with hints and guess input"
+      >
+        <div class="hints" aria-live="polite">
+          <h3 class="hints-title">Score</h3>
+          <p class="hint" id="score">1000 pts</p>
+        </div>
+        <div class="hints" id="hints" aria-live="polite">
+          <h3 class="hints-title">Hints</h3>
+          <p class="hint">No hints yet. They will appear here.</p>
+        </div>
+        <form
+          id="guess-form"
+          class="guess-form sidebar-form"
+          aria-label="Country guess form"
+        >
+          <div class="form-row inline">
+            <label for="country" class="form-label">Your Guess</label>
+            <div class="input-action-row">
+              <div class="select-wrapper flex-grow">
+                <select
+                  id="country"
+                  name="country"
+                  class="country-select"
+                  required
+                  aria-required="true"
+                >
+                  <option value="" disabled selected>Country...</option>
+                  <option value="canada">Canada</option>
+                  <option value="usa">United States</option>
+                  <option value="germany">Germany</option>
+                  <option value="brazil">Brazil</option>
+                  <option value="japan">Japan</option>
+                  <option value="uk">UK</option>
+                  <option value="france">France</option>
+                  <option value="italy">Spain</option>
+                  <option value="india">India</option>
+                  <option value="australia">Australia</option>
+                  <option value="south-africa">South Africa</option>
+                  <option value="china">China</option>
+                  <option value="russia">Russia</option>
+                  <option value="estonia">Estonia</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                aria-label="Submit your country guess"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+          <p class="hint" id="guesses-remaining" style="display: none"></p>
+        </form>
+      </aside>
+    </main>
+    <footer class="footer">
+      <small>&copy; <span id="year"></span> NewsGuesser</small>
+    </footer>
+    <div id="custom-alert" class="custom-alert">
+      <div class="custom-alert-content">
+        <p id="custom-alert-text">This is an alert!</p>
+        <button id="custom-alert-btn" class="btn btn-primary">
+          Play Again
+        </button>
+      </div>
+    </div>
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NewsGuesser</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <main class="card" role="main">
+    <header>
+      <h1>NewsGuesser</h1>
+      <p class="tagline">Guess where the story happened using only sparse clues.</p>
+    </header>
+    <div class="actions">
+      <a class="btn btn-primary" href="/play.html" aria-label="Start playing the NewsGuesser game">Play</a>
+    </div>
+    <nav class="nav-links" aria-label="Secondary navigation">
+      <a href="/rules.html">Rules</a>
+      <span class="divider" aria-hidden="true">•</span>
+      <a href="/about.html">About</a>
+    </nav>
+  </main>
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> NewsGuesser</small>
+  </footer>
+  <script>
+    // Set current year without needing another request
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
