@@ -1,3 +1,7 @@
+## Game URL
+
+Play the game at: https://adamw-git.github.io/news-guess/client/index.html
+
 ## Setup for Game
 
 1. Clone the repository:
