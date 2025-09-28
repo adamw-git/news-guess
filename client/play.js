@@ -69,11 +69,28 @@ const articles = [
   },
 ]
 
-let i = localStorage.getItem('articleIndex') || 0
-if (i >= articles.length) i = 0
-localStorage.setItem('articleIndex', Number(i) + 1)
+let totalScore = Number(localStorage.getItem('totalScore')) || 0
+let score = 1000
+let guessCount = 0
+const maxGuesses = 3
 
-const article = new Article(articles[i])
+let usedArticles = JSON.parse(localStorage.getItem('usedArticles')) || []
+
+// Pick a random index that hasn’t been used yet
+let availableIndexes = articles.map((_, i) => i).filter(i => !usedArticles.includes(i))
+
+// If we’ve used all articles, reset
+if (availableIndexes.length === 0) {
+  usedArticles = []
+  availableIndexes = articles.map((_, i) => i)
+}
+
+const randomIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)]
+usedArticles.push(randomIndex)
+
+localStorage.setItem('usedArticles', JSON.stringify(usedArticles))
+
+const article = new Article(articles[randomIndex])
 
 const articleSection = document.getElementById('article-section')
 articleSection.textContent = article.section
@@ -100,64 +117,78 @@ for (const line of content.split('\n')) {
 const hintsDiv = document.getElementById('hints')
 const scoreEl = document.getElementById('score')
 
-let score = 1000
-let guessCount = 0
-const maxGuesses = 3
-
 document
   .getElementById('guess-form')
   .addEventListener('submit', async function (e) {
     e.preventDefault()
     const getCountry = document.getElementById('country')
     if (!getCountry.value) return
+
     const guess =
       getCountry.options[getCountry.selectedIndex].value.toLowerCase()
+
+    // ✅ Correct guess
     if (guess === article.country.toLowerCase()) {
+      clearInterval(scoreTimer) // ✅ stop ticking
       return await customAlert(
-        `✅ Correct! The article is from ${
-          article.country
-        }.\nYour final score was <b>${Math.round(score)}</b> pts.`
+        `✅ Correct! The article is from ${article.country}.<br>
+        You earned <b>${Math.round(score)}</b> pts.<br><br>
+        <b>Total Score:</b> ${totalScore + Math.round(score)} pts.`,
+        true // tell customAlert it’s a win
       )
-    } else {
-      guessCount++
-      if (guessCount >= maxGuesses) {
-        return await customAlert(
-          `❌ Wrong guess! You've used all your attempts. The article is from ${article.country}.`
-        )
-      }
-
-      const hintsRemaining = document.getElementById('guesses-remaining')
-      hintsRemaining.style.display = 'block'
-      hintsRemaining.textContent = `❌ Wrong guess! You have ${
-        maxGuesses - guessCount
-      } attempts left.`
-
-      getCountry.value = ''
-      getCountry.focus()
-      switch (guessCount) {
-        case 1: {
-          articleDate.classList.remove('redacted')
-          const el = document.createElement('p')
-          el.className = 'hint'
-          el.textContent = `The article was published on ${article.date.toDateString()}.`
-          hintsDiv.appendChild(el)
-          break
-        }
-        case 2: {
-          articleImage.classList.remove('blurred')
-          const el = document.createElement('p')
-          el.className = 'hint'
-          el.textContent = 'The image related to the article has been revealed.'
-          hintsDiv.appendChild(el)
-          break
-        }
-      }
-      score -= 200
-      scoreEl.textContent = `${Math.round(score)} pts`
     }
+
+    // ❌ Wrong guess
+    guessCount++
+    if (guessCount >= maxGuesses) {
+      localStorage.setItem("totalScore", 0) // save totalScore before reloading
+      return await customAlert(
+        `❌ Wrong guess! You've used all your attempts.<br>
+        The article is from <b>${article.country}</b>.<br><br>
+        <b>Your Final Score:</b> ${totalScore} pts.`,
+        false, // not a win
+        true   // this is a loss
+      )
+    }
+
+    // Show remaining guesses
+    const hintsRemaining = document.getElementById('guesses-remaining')
+    hintsRemaining.style.display = 'block'
+    hintsRemaining.textContent = `❌ Wrong guess! You have ${
+      maxGuesses - guessCount
+    } attempts left.`
+
+    // Reset input
+    getCountry.value = ''
+    getCountry.focus()
+
+    // Reveal hints step by step
+    switch (guessCount) {
+      case 1: {
+        articleDate.classList.remove('redacted')
+        const el = document.createElement('p')
+        el.className = 'hint'
+        el.textContent = `The article was published on ${article.date.toDateString()}.`
+        hintsDiv.appendChild(el)
+        break
+      }
+      case 2: {
+        articleImage.classList.remove('blurred')
+        const el = document.createElement('p')
+        el.className = 'hint'
+        el.textContent = 'The image related to the article has been revealed.'
+        hintsDiv.appendChild(el)
+        break
+      }
+    }
+
+    // Deduct points
+    score -= 200
+    scoreEl.textContent = `${Math.round(score)} pts`
   })
 
-setInterval(() => {
+// ⏲️ Keep reference so we can clear it later
+const scoreTimer = setInterval(() => {
   score -= 5
   if (score < 0) score = 0
   scoreEl.textContent = `${Math.round(score)} pts`
@@ -167,7 +198,7 @@ function replaceRedacted(str) {
   return str.replace(/(#+)/g, '<span class="redacted">$1</span>')
 }
 
-function customAlert(message) {
+async function customAlert(message, isWin = false, isLoss = false) {
   return new Promise(resolve => {
     const alertBox = document.getElementById('custom-alert')
     const alertText = document.getElementById('custom-alert-text')
@@ -177,7 +208,19 @@ function customAlert(message) {
     alertBox.style.display = 'flex'
 
     alertBtn.onclick = function () {
-      location.reload()
+      alertBox.style.display = 'none'
+      clearInterval(scoreTimer) // ✅ stop ticking on win/loss
+
+      if (isWin) {
+        totalScore += Math.round(score)
+        localStorage.setItem('totalScore', totalScore)
+        location.reload()
+        clearInterval(scoreTimer) // ✅ stop ticking
+      } else if (isLoss) {
+        localStorage.setItem("totalScore", 0) // reset totalScore on loss
+        location.reload()
+      }
+
       resolve()
     }
   })
